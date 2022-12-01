@@ -1,4 +1,6 @@
+import { size } from 'lodash'
 import React, { useEffect, useState } from 'react'
+import { getCollection } from '../../helpers/Actions'
 import './Tasks.css'
 
 const Tasks = () => {
@@ -7,6 +9,10 @@ const Tasks = () => {
   const [editMode, setEditMode] = useState(false)
 
   useEffect(() => {
+    (async () => {
+      const result = await getCollection("Tasks")
+      result.statusResponse&&setTasks(result.data)
+    })()
   }, [])
 
   return (
@@ -16,11 +22,26 @@ const Tasks = () => {
       <div className="row">
         <div className="col-md-8 col-sm-12">
           <h4 className="text-center">Lista de Tareas</h4>
+          {
+            size(tasks) === 0 ? (<h4>No hay tareas</h4>) : (
+              <ul className='list-group'>
+                {
+                  tasks.map((taskInfo) => (
+                    <li className='list-group-item' key={taskInfo.id}>
+                      <span className='lead'>
+                        {taskInfo.name}
+                      </span>
+                    </li>
+                  ))
+                }
+              </ul>
+            )
+          }
         </div>
         <div className="col-md-4 col-sm-12">
           <h4>{editMode ? 'Modificar Tarea' : 'Agregar Tarea'}</h4>
 
-          <form onSubmit={editMode ? saveTask : addTask}>
+          <form >
             <textarea
               type="input"
               placeholder="Ingrese tarea..."
